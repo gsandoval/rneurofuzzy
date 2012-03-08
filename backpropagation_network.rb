@@ -26,16 +26,22 @@ class BackPropagationNetwork
 	end
 	
 	def train(ps, es)
-		@max_epochs.times do
+		epoch_error = 0
+		@max_epochs.times do |epoch|
 			epoch_error = 0
 			ps.zip(es).each do |p, e|
 				y = classify p
 				d = [e, y].transpose.map {|x| x.reduce :-}
 				backpropagate d
 				epoch_error += d.map {|err| err**2}.reduce :+
+				puts "============================="
 			end
-			break if epoch_error / es.size < @max_error
+			break if epoch_error.nan?
+			epoch_error /= es.size
+			puts "epoch: #{epoch}, epoch error: #{epoch_error}"
+			break if epoch_error < @max_error
 		end
+		#puts epoch_error
 	end
 	
 	def classify(pattern)
@@ -47,18 +53,19 @@ class BackPropagationNetwork
 				curr[j].input = (0..prev.size-1).map {|k| prev[k].fire(j)}
 			end
 		end
-		@layers[@layers.size-1].map {|n| n.fire(0)}
+		@layers.last.map {|n| n.fire(0)}
 	end
 	
 	private
 	
 	def backpropagate(d)
-		d.zip(@layers[@layers.size-1]).each {|od, neuron| neuron.delta = od}
+		d.zip(@layers.last).each {|od, neuron| neuron.delta = od}
 		(@layers.size-1).downto(1) do |i|
-			curr, prev = @layers[i-1], @layers[i]
-			curr_layer_output = @layers.last == prev ? curr.size-1 : curr.size-2 # Bias extra neuron
-			for j in (0..curr_layer_output)
-				curr[j].delta = (0..prev.size-1).map {|k| prev[k].delta}
+			nxt, curr = @layers[i-1], @layers[i]
+			curr_layer_input = @layers.last == curr ? curr.size-1 : curr.size-2 # Bias extra neuron
+			for j in (0..nxt.size-1)
+				ds = (0..curr_layer_input).map {|k| curr[k].delta}
+				nxt[j].delta = ds
 			end
 		end
 	end
@@ -69,7 +76,7 @@ class Neuron
 	attr_reader :delta
 
 	def initialize(next_layer_size)
-		@output = Array.new next_layer_size 
+		@output = Array.new next_layer_size
 		@weights = (1..next_layer_size).map {|v| rand * 2 - 1}
 	end
 	
@@ -83,10 +90,20 @@ class Neuron
 	
 	def delta=(d)
 		@delta = [d.take(@weights.size), @weights].transpose.map {|x| x.reduce :*}.reduce(:+)
-		fix_weights
+		puts "before #{@weights.inspect}"
+		@weights = @weights.zip(@output, d).map {|w, out, dlt| w + @learning_rate * dlt * activation_function_derivative(out) * @input}
+		puts "after  #{@weights.inspect}"
 	end
 	
 	private
+	
+	#def activation_function(t)
+	#	t > 0 ? 1.0 : 0.0
+	#end
+	
+	#def activation_function_derivative(t)
+	#	1
+	#end
 	
 	def activation_function(t)
 		1.0 / (1 + Math::exp(-t))
@@ -94,10 +111,6 @@ class Neuron
 	
 	def activation_function_derivative(t)
 		t * (1 - t)
-	end
-	
-	def fix_weights
-		@weights = @weights.map {|w| puts @learning_rate; w + @learning_rate * @delta * activation_function_derivative(w * @input) * @input}
 	end
 end
 
@@ -114,16 +127,17 @@ class OutputNeuron < Neuron
 	
 	def delta=(d)
 		@delta = d
-		fix_weights
 	end
 end
 
 class BiasNeuron < Neuron
 	def initialize(next_layer_size)
 		@weights = (1..next_layer_size).map {|v| rand * 2 - 1}
+		@output = Array.new next_layer_size
+		@input = 1.0
 	end
 	
 	def fire(n)
-		@weights[n]
+		@output[n] = @weights[n]
 	end
 end

@@ -3,7 +3,7 @@
 require 'backpropagation_network'
 
 n = BackPropagationNetwork.new(2, 1, 3, 2)
-n.learning_rate = 0.2
+n.learning_rate = 0.5
 n.max_error = 0.0001
 n.max_epochs = 1
 
