@@ -1,5 +1,5 @@
-#!/usr/bin/env jruby
-require 'perceptron_network'
+#!/usr/bin/env ruby
+require_relative 'perceptron_network'
 
 line = gets.chomp
 pattern_w, pattern_h = line.split(" ").map { |c| Integer(c) }
@@ -47,7 +47,7 @@ symbols.each_index do |i|
 end
 characteristics_vector_size = patterns[symbols[0]][0].size
 
-nn = PerceptronNetwork.new(len, characteristics_vector_size)
+nn = Neurofuzzy::PerceptronNetwork.new(len, characteristics_vector_size)
 epochs, error = nn.train training_dataset
 
 puts "#{epochs} epochs and #{error} of error"

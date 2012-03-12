@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'backpropagation_network'
+require_relative 'backpropagation_network'
 
-n = BackPropagationNetwork.new(2, 1, 3)
+n = Neurofuzzy::BackPropagationNetwork.new(2, 1, 3)
 n.learning_rate = 0.7
 n.momentum = 0.3
 n.max_error = 0.0001
