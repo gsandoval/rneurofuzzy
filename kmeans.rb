@@ -1,6 +1,4 @@
-
 module Neurofuzzy
-
   class KMeans
     def initialize(cluster_count)
       @cluster_count = cluster_count
@@ -46,5 +44,4 @@ module Neurofuzzy
       data.map {|d| d.zip(maxs, mins).map {|v, max, min| (v - min) * 1.0 / (max - min)}}
     end
   end
-
 end

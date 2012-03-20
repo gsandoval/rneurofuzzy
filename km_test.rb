@@ -8,7 +8,8 @@ while line = gets
   toks = line.chomp.split("\t")
   real_class.push toks[0].chomp
   d = []
-  (1..toks.size-1).each {|i| d.push Float(toks[i].chomp)}
+  #(1..toks.size-1).each {|i| d.push Float(toks[i].chomp)}
+  (1..3).each {|i| d.push Float(toks[i].chomp)}
   data.push d
 end
 

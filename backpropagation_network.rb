@@ -1,6 +1,4 @@
-
 module Neurofuzzy
-
   class BackPropagationNetwork
     attr_accessor :max_error, :max_epochs
     attr_reader :learning_rate, :momentum
@@ -140,5 +138,4 @@ module Neurofuzzy
       fx * (1 - fx)
     end
   end
-
 end

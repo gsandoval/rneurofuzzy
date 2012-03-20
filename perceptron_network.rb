@@ -1,7 +1,6 @@
 require 'matrix'
 
 module Neurofuzzy
-
   class PerceptronNetwork
     def initialize(*args)
       if args[0].kind_of? Array #The one thing I don't like from Ruby: no ctor overload
@@ -73,5 +72,4 @@ module Neurofuzzy
       step_activation_function(x.transpose * @w + @b.transpose)
     end
   end
-
 end
