@@ -36,6 +36,7 @@ module Neurofuzzy
 
     def train(ps, es)
       epoch_error = 0
+      begin
       @max_epochs.times do |epoch|
         epoch_error = 0
         ps.zip(es).each do |p, e|
@@ -56,9 +57,11 @@ module Neurofuzzy
         #		puts "#{p.inspect} -> #{y.inspect}"
         #	end
         #end
-        puts "epoch #{epoch}: #{epoch_error}"
+        print "epoch #{epoch}: #{epoch_error}\r"
 
         break if epoch_error < @max_error
+      end
+      rescue Interrupt
       end
       puts "Final epoch error: #{epoch_error}"
       trained_weights = []
@@ -130,10 +133,12 @@ module Neurofuzzy
     private
 
     def activation_function(t)
+      #Math::tanh(t)
       1.0 / (1 + Math::exp(-t))
     end
 
     def activation_function_derivative(t)
+      #1 - t**2
       fx = 1.0 / (1 + Math::exp(-t))
       fx * (1 - fx)
     end
