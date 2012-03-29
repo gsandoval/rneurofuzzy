@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-require_relative 'perceptron_network'
+$LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib') unless $LOAD_PATH.include?(File.dirname(__FILE__) + '/../lib')
+require "neurofuzzy"
 
 line = gets.chomp
 pattern_w, pattern_h = line.split(" ").map { |c| Integer(c) }

@@ -37,31 +37,24 @@ module Neurofuzzy
     def train(ps, es)
       epoch_error = 0
       begin
-      @max_epochs.times do |epoch|
-        epoch_error = 0
-        ps.zip(es).each do |p, e|
-          y = classify p
-          e = e.map {|x| x == 0 ? 0.00000000001 : (x == 1 ? 0.999999999999 : x)}
-          err = [y, e].transpose.map {|x| x.reduce :-}
-          backpropagate err
-          epoch_error += err.map {|e| e**2}.reduce :+
+        @max_epochs.times do |epoch|
+          epoch_error = 0
+          ps.zip(es).each do |p, e|
+            y = classify p
+            e = e.map {|x| x == 0 ? 0.00000000001 : (x == 1 ? 0.999999999999 : x)}
+            err = [y, e].transpose.map {|x| x.reduce :-}
+            backpropagate err
+            epoch_error += err.map {|e| e**2}.reduce :+
+          end
+          break if epoch_error.nan?
+          epoch_error /= 2.0
+
+          print "epoch #{epoch}: #{epoch_error}\r"
+
+          break if epoch_error < @max_error
         end
-        break if epoch_error.nan?
-        #epoch_error = Math::sqrt(epoch_error / es.size)
-        epoch_error /= 2.0
-
-        #if epoch % 1000 == 0
-        #	puts "epoch: #{epoch}, epoch error: #{epoch_error}"
-        #	ps.zip(es).each do |p, e|
-        #		y = classify p
-        #		puts "#{p.inspect} -> #{y.inspect}"
-        #	end
-        #end
-        print "epoch #{epoch}: #{epoch_error}\r"
-
-        break if epoch_error < @max_error
-      end
       rescue Interrupt
+        # We want to at least keep the progress of we have on the weights
       end
       puts "Final epoch error: #{epoch_error}"
       trained_weights = []

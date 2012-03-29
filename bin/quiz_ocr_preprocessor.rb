@@ -1,14 +1,14 @@
 
 require 'chunky_png'
 
-class OCRPreprocessor
+class QuizOcrPreprocessor
   def initialize
     @red = 0
     @green = 1
     @blue = 2
   end
   def process(raw_image)
-    #raw_image = raw_image.resample 15, 15
+    raw_image = raw_image.resample 15, 15
     img_w = raw_image.dimension.width
     img_h = raw_image.dimension.height
 
